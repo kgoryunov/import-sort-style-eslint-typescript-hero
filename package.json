@@ -1,0 +1,9 @@
+{
+  "name": "import-sort-style-eslint-typescript-hero",
+  "version": "1.0.0",
+  "description": "import-sort-style that mimics import-sort and typescript-hero sorting applied one after another with default settings",
+  "main": "src/index.js",
+  "author": "Kostya Goryunov",
+  "repository": "kgoryunov/import-sort-style-eslint-typescript-hero",
+  "license": "MIT"
+}
