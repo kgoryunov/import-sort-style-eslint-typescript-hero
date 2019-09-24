@@ -8,6 +8,9 @@ import 'a';
 import 'b';
 import 'c';
 
+import { ArgumentsHost } from '@nestjs/common';
+import { GqlArgumentsHost } from '@nestjs/graphql';
+
 import * as aa from 'aa';
 import aaa, { bbb } from 'aaa';
 import aaaa from 'aaaa';
@@ -31,7 +34,16 @@ import * as ee from './ee';
   ```json
   {
     ".ts": {
-      "style": "/{global_node_modules_path}/import-sort-style-typescript-hero"
+      "style": "/{global_node_modules_path}/import-sort-style-eslint-typescript-hero",
+      "options": {
+        "tsHeroGroupsConfig": [
+          "/request-context/",
+          "Plains",
+          "/@nestjs/",
+          "Modules",
+          "Workspace"
+        ]
+      }
     }
   }
   ```

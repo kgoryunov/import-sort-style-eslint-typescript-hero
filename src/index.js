@@ -1,4 +1,4 @@
-exports.default = function (styleApi) {
+exports.default = function(styleApi, file, options) {
   const {
     alias,
     and,
@@ -7,38 +7,62 @@ exports.default = function (styleApi) {
     isAbsoluteModule,
     isRelativeModule,
     moduleName,
-    unicode,
+    unicode: stringSort,
   } = styleApi;
 
-  const eslintSort = (first, second) => unicode(first, second);
+  const tsHeroGroupsConfig = options.tsHeroGroupsConfig || ['Plains', 'Modules', 'Workspace'];
+
+  const eslintSort = (first, second) => stringSort(first, second);
 
   const typescriptHeroSort = (first, second) =>
-    unicode(first.toLowerCase(), second.toLowerCase());
+    stringSort(first.toLowerCase(), second.toLowerCase());
 
-  return [
-    // 1. ImportGroupKeyword.Plains e.g. import 'foo';
-    {
-      match: and(isAbsoluteModule, hasNoMember),
-      sort: moduleName(typescriptHeroSort),
-    },
-    { separator: true },
-
-    // 2. ImportGroupKeyword.Modules e.g. import Foo from 'bar';
-    {
+  const tsHeroStylesByGroupName = {
+    Modules: {
       match: and(isAbsoluteModule, hasMember),
       sort: moduleName(typescriptHeroSort),
       sortNamedMembers: alias(eslintSort),
     },
-    { separator: true },
-
-    // 3. ImportGroupKeyword.Workspace e.g. import Foo from './bar';
-    {
+    Plains: {
+      match: and(isAbsoluteModule, hasNoMember),
+      sort: moduleName(typescriptHeroSort),
+    },
+    Workspace: {
       match: isRelativeModule,
       sort: moduleName(typescriptHeroSort),
       sortNamedMembers: alias(eslintSort),
     },
-    { separator: true },
+    Remaining: undefined,
+  };
 
-    // 4. RemainImportGroup (the rest)
-  ];
+  const importSortStyles = [];
+
+  for (const groupNameOrRegexp of tsHeroGroupsConfig) {
+    const style = tsHeroStylesByGroupName[groupNameOrRegexp];
+
+    if (style) {
+      importSortStyles.push(style);
+    } else if (isRegexpGroup(groupNameOrRegexp)) {
+      const matchingRegexp = buildRegexpGroupMatcher(groupNameOrRegexp);
+
+      importSortStyles.push({
+        match: matchingRegexp,
+        sort: moduleName(typescriptHeroSort),
+        sortNamedMembers: alias(eslintSort),
+      });
+    }
+
+    importSortStyles.push({ separator: true });
+  }
+
+  return importSortStyles;
+};
+
+const isRegexpGroup = group => /^\/.+\/$/.test(group);
+
+const buildRegexpGroupMatcher = regexpString => imported => {
+  const regexpStringWithTrimmedSlashes = regexpString.substring(1, regexpString.length - 1);
+  const regex = new RegExp(regexpStringWithTrimmedSlashes, 'g');
+
+  return regex.test(imported.moduleName);
 };
