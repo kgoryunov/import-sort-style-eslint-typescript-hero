@@ -7,6 +7,7 @@ exports.default = function(styleApi, file, options) {
     isAbsoluteModule,
     isRelativeModule,
     moduleName,
+    or,
     unicode: stringSort,
   } = styleApi;
 
@@ -24,11 +25,11 @@ exports.default = function(styleApi, file, options) {
       sortNamedMembers: alias(eslintSort),
     },
     Plains: {
-      match: and(isAbsoluteModule, hasNoMember),
+      match: and(or(isAbsoluteModule, isRelativeModule), hasNoMember),
       sort: moduleName(typescriptHeroSort),
     },
     Workspace: {
-      match: isRelativeModule,
+      match: and(isRelativeModule, hasMember),
       sort: moduleName(typescriptHeroSort),
       sortNamedMembers: alias(eslintSort),
     },
